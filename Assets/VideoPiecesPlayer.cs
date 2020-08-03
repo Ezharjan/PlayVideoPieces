@@ -16,6 +16,7 @@ public class VideoPiecesPlayer : MonoBehaviour
 
     private int videoIndex = 1;
 
+    private bool isVideoPlaying = false;
 
 
     void PlayVideoPieces(string videoPieces)
@@ -23,26 +24,37 @@ public class VideoPiecesPlayer : MonoBehaviour
         videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().url = videoPieces;
         videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().Prepare();
         videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().Play();
+        isVideoPlaying = true;
     }
 
 
     void MakePiecesIntoWhole()
     {
-        while (videoIndex <= videoPiecesCount)
-        {
-            if (videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().isPlaying)
-            {
-                print("is playing...");
-                return;
-            }
 
+        if (videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().frameCount.Equals(405))
+        {
+            isVideoPlaying = false;
+        }
+
+        if (isVideoPlaying)
+        {
+            return;
+        }
+        else
+        {
             PlayVideoPieces(videoPiecesPath + videoIndex + ".mp4");
-            print("playing: " + videoIndex);
+            //print("playing: " + videoIndex);
             videoIndex++;
         }
+
     }
 
 
-    void Start() {MakePiecesIntoWhole();}
-    void Update() {  }
+    void Start() { }
+
+    void Update()
+    {
+        MakePiecesIntoWhole();
+        print(videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().frameCount);
+    }
 }
