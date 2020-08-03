@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Video;
 
 /*by Alexander*/
@@ -11,12 +7,12 @@ public class VideoPiecesPlayer : MonoBehaviour
 {
     public GameObject videoPlayerPlane = null;
 
-    private string videoPiecesPath = "D:/4-th_Grade/New folder/MP4Pieces/";
+    //Change the path and video pieces count below to your own
+    private string videoPiecesPath = "D:/4-th_Grade/UnityVideoPiecesTest/MP4Pieces/";
     private int videoPiecesCount = 23;
 
     private int videoIndex = 1;
-
-    private bool isVideoPlaying = false;
+    private int lastVideoIndex = 1;
 
 
     void PlayVideoPieces(string videoPieces)
@@ -24,37 +20,38 @@ public class VideoPiecesPlayer : MonoBehaviour
         videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().url = videoPieces;
         videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().Prepare();
         videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().Play();
-        isVideoPlaying = true;
     }
 
 
-    void MakePiecesIntoWhole()
+    void OnVideoEnded(VideoPlayer videoPlayer)
     {
-
-        if (videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().frameCount.Equals(405))
-        {
-            isVideoPlaying = false;
-        }
-
-        if (isVideoPlaying)
-        {
-            return;
-        }
-        else
-        {
-            PlayVideoPieces(videoPiecesPath + videoIndex + ".mp4");
-            //print("playing: " + videoIndex);
-            videoIndex++;
-        }
-
+        Debug.Log("Video " + videoIndex + " ended!");
+        videoIndex++;
     }
 
-
-    void Start() { }
+    void Start()
+    {
+        videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().loopPointReached += OnVideoEnded;
+        PlayVideoPieces(videoPiecesPath + videoIndex + ".mp4");//First piece to open all
+    }
 
     void Update()
     {
-        MakePiecesIntoWhole();
-        print(videoPlayerPlane.gameObject.GetComponent<VideoPlayer>().frameCount);
+        if (videoIndex > lastVideoIndex)
+        {
+            lastVideoIndex++;
+            PlayVideoPieces(videoPiecesPath + videoIndex + ".mp4");
+            print("Play next piece!");
+        }
+        //When all have played
+        if (videoIndex.Equals(videoPiecesCount))
+        {
+            print("finished!");
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+	Application.Quit();
+#endif
+        }
     }
 }
